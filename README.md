@@ -5,7 +5,7 @@ This repository contains the code and resources for Milestone 3 Deep Learning, w
 ## Train
 This folder contains Jupyter notebooks for both training and testing the neural network model. It includes all the steps performed, from data preprocessing to model evaluation.
 
-##Steps to build and run the dockerized web application:
+## Steps to build and run the dockerized web application:
 
 1. Download/Clone the Repository
 2. Prepare the Model. Create a directory named "model" in the project root and place the downloaded model file inside it.
