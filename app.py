@@ -5,15 +5,11 @@ from PIL import Image
 from torchvision.models import detection
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')  # Para evitar problemas en sistemas sin entorno gráfico
+matplotlib.use('Agg')  
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from flask import Flask, request, render_template, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
-
-# -----------------------------
-# Código del modelo (basado en lo que has provisto)
-# -----------------------------
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
@@ -116,9 +112,9 @@ def get_model(model_name: str, model_path: str = '', num_classes: int = 2,
 
     return model, optimizer, initial_epoch, device
 
-# Parámetros del modelo
+# Model parameters
 model_name = 'retinanet_v2'
-model_path = 'model/model_Adadelta_1280_0005.pt' # Ajusta la ruta a donde tengas el modelo
+model_path = 'model/model_Adadelta_1280_0005.pt'
 num_classes = 2
 pretrained = False
 use_gpu = True
@@ -142,8 +138,7 @@ def predict_objects(image_path, output_dir='static/detections'):
     scores = predictions['scores']
     boxes = predictions['boxes']
 
-    # Filtrar por confianza > 0.21
-    high_confidence_indices = scores > 0.21
+    high_confidence_indices = scores > 0.5
     labels = labels[high_confidence_indices]
     scores = scores[high_confidence_indices]
     boxes = boxes[high_confidence_indices]
@@ -177,9 +172,7 @@ def predict_objects(image_path, output_dir='static/detections'):
     plt.close(fig)
     return output_image_path
 
-# -----------------------------
-# Código Flask
-# -----------------------------
+
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -189,7 +182,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Verificar si se ha enviado un fichero
         if 'file' not in request.files:
             return "No file found", 400
         file = request.files['file']
@@ -199,13 +191,11 @@ def index():
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(image_path)
         
-        # Realizar la predicción
         output_path = predict_objects(image_path)
         return render_template('result.html', original_image=url_for('static', filename='uploads/' + filename), 
                                detected_image=url_for('static', filename='detections/' + os.path.basename(output_path)))
     return render_template('index.html')
 
-# Ruta para servir las imágenes estáticas
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_from_directory('static', filename)
