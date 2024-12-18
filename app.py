@@ -138,7 +138,7 @@ def predict_objects(image_path, output_dir='static/detections'):
     scores = predictions['scores']
     boxes = predictions['boxes']
 
-    high_confidence_indices = scores > 0.5
+    high_confidence_indices = scores > 0.35
     labels = labels[high_confidence_indices]
     scores = scores[high_confidence_indices]
     boxes = boxes[high_confidence_indices]
